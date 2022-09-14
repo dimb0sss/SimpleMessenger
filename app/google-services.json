@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "125046348276",
+    "project_id": "messenger-c4202",
+    "storage_bucket": "messenger-c4202.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:125046348276:android:8de7865e36ea67e3c581a1",
+        "android_client_info": {
+          "package_name": "com.lvovds.simplemessenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "125046348276-6ftbl8genl53u1c900pbodeq1u3thtqa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQo7LMCMDiZOfQvQjG9syaB8sktBJki78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "125046348276-6ftbl8genl53u1c900pbodeq1u3thtqa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
