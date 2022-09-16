@@ -13,9 +13,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterViewModel extends ViewModel {
     private FirebaseAuth mAuth;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference usersReference;
+
     private MutableLiveData<String> errorText = new MutableLiveData<>();
     private MutableLiveData<FirebaseUser> user = new MutableLiveData<>();
 
@@ -29,11 +34,23 @@ public class RegisterViewModel extends ViewModel {
                 }
             }
         });
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        usersReference = firebaseDatabase.getReference("Users");
     }
 
-    public void createAccount(String email,String pass,String name,String latName,int age) {
+    public void createAccount(String email,String pass,String name,String lastName,int age) {
         mAuth.createUserWithEmailAndPassword(email, pass)
-                .addOnFailureListener(new OnFailureListener() {
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult authResult) {
+                        FirebaseUser firebaseUser = authResult.getUser();
+                        if (firebaseUser==null) {
+                            return;
+                        }
+                        User user = new User(firebaseUser.getUid(),name,lastName,age,false);
+                        usersReference.child(firebaseUser.getUid()).setValue(user);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         errorText.setValue(e.getMessage());

@@ -59,8 +59,8 @@ public class RegisterActivity extends AppCompatActivity {
                 if (!getTrimmedValue(editTextAge).isEmpty()) {
                      age = Integer.parseInt(getTrimmedValue(editTextAge));
                 }
-                if (email.isEmpty() && password.isEmpty() && name.isEmpty() && lastName.isEmpty()
-                        && getTrimmedValue(editTextAge).isEmpty()) {
+                if (email.isEmpty() || password.isEmpty() || name.isEmpty() || lastName.isEmpty()
+                        || getTrimmedValue(editTextAge).isEmpty()) {
                     Toast.makeText(RegisterActivity.this, "Fill in all fields", Toast.LENGTH_SHORT).show();
                 } else {
                     viewModel.createAccount(email, password, name, lastName, age);

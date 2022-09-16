@@ -4,23 +4,50 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class UsersActivity extends AppCompatActivity {
     private UsersViewModel usersViewModel;
+    private UsersAdapter adapter;
+    private RecyclerView recyclerViewUsers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
+        initViews();
         usersViewModel=new ViewModelProvider(this).get(UsersViewModel.class);
         observeViewModel();
+        usersViewModel.getUserList().observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                adapter.setUsers(users);
+            }
+        });
+
+    }
+
+    private void initViews() {
+        recyclerViewUsers = findViewById(R.id.recyclerViewUsers);
+        adapter = new UsersAdapter();
+        recyclerViewUsers.setAdapter(adapter);
     }
 
     private void observeViewModel() {
