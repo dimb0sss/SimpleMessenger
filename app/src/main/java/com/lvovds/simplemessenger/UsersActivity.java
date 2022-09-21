@@ -6,6 +6,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,13 +29,25 @@ public class UsersActivity extends AppCompatActivity {
     private UsersAdapter adapter;
     private RecyclerView recyclerViewUsers;
 
+    private static final String EXTRA_CURRENT_USER_ID = "current_id";
+
+    private String currentUserid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
         initViews();
+        currentUserid = getIntent().getStringExtra(EXTRA_CURRENT_USER_ID);
         usersViewModel=new ViewModelProvider(this).get(UsersViewModel.class);
         observeViewModel();
+        adapter.setOnUserClickListener(new UsersAdapter.OnUserClickListener() {
+            @Override
+            public void onUserClick(User user) {
+                Intent intent = ChatActivity.newIntent(UsersActivity.this,currentUserid,user.getId());
+                startActivity(intent);
+            }
+        });
         usersViewModel.getUserList().observe(this, new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
@@ -75,5 +88,11 @@ public class UsersActivity extends AppCompatActivity {
             usersViewModel.logOut();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static Intent newIntent(Context context, String currentUserid){
+        Intent intent = new Intent(context,UsersActivity.class);
+        intent.putExtra(EXTRA_CURRENT_USER_ID,currentUserid);
+        return intent;
     }
 }

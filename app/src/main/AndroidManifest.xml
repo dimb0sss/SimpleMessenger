@@ -14,13 +14,16 @@
         android:theme="@style/Theme.SimpleMessenger"
         tools:targetApi="31">
         <activity
-            android:name=".RegisterActivity"
-            android:windowSoftInputMode="adjustResize"
+            android:name=".ChatActivity"
             android:exported="false" />
         <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".ResetPasswordActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".UsersActivity"
             android:exported="false" />
