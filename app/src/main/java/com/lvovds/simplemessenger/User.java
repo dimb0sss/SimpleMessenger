@@ -5,14 +5,16 @@ public class User {
     private String name;
     private String lastName;
     private  int age;
-    private boolean isOnline;
+    private boolean online;
+    private String token;
 
-    public User(String id, String name, String lastName, int age, boolean isOnline) {
+    public User(String id, String name, String lastName, int age, boolean online, String token) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.age = age;
-        this.isOnline = isOnline;
+        this.online = online;
+        this.token = token;
     }
 
     public User() {
@@ -35,6 +37,10 @@ public class User {
     }
 
     public boolean isOnline() {
-        return isOnline;
+        return online;
+    }
+
+    public String getToken() {
+        return token;
     }
 }

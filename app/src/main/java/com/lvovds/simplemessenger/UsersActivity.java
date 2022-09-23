@@ -41,6 +41,7 @@ public class UsersActivity extends AppCompatActivity {
         currentUserid = getIntent().getStringExtra(EXTRA_CURRENT_USER_ID);
         usersViewModel=new ViewModelProvider(this).get(UsersViewModel.class);
         observeViewModel();
+        usersViewModel.setUserTokenId();
         adapter.setOnUserClickListener(new UsersAdapter.OnUserClickListener() {
             @Override
             public void onUserClick(User user) {
@@ -88,6 +89,18 @@ public class UsersActivity extends AppCompatActivity {
             usersViewModel.logOut();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        usersViewModel.setUserOnline(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        usersViewModel.setUserOnline(true);
     }
 
     public static Intent newIntent(Context context, String currentUserid){

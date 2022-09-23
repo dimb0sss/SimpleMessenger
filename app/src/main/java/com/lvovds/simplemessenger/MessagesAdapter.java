@@ -1,5 +1,6 @@
 package com.lvovds.simplemessenger;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         this.currentUserId = currentUserId;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setMessages(List<Message> messages) {
         this.messages = messages;
         notifyDataSetChanged();
