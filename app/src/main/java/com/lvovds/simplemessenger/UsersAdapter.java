@@ -1,5 +1,8 @@
 package com.lvovds.simplemessenger;
 
+import static com.lvovds.simplemessenger.Time.lastOnlineStatus;
+import static com.lvovds.simplemessenger.Time.lastOnlineTime;
+
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +25,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.user_item,parent,false);
+                .inflate(R.layout.user_item, parent, false);
         return new UserViewHolder(view);
     }
 
@@ -30,20 +33,27 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = users.get(position);
         holder.textViewUserInfo
-                .setText(String.format("%s %s, %s",user.getName(),user.getLastName(),user.getAge()));
+                .setText(String.format("%s %s, %s", user.getName(), user.getLastName(), user.getAge()));
 
         int bgResid;
+        String lastOnlineInfo = "";
         if (user.isOnline()) {
             bgResid = R.drawable.light_online;
+            lastOnlineInfo = "Online";
         } else {
             bgResid = R.drawable.light_offline;
+
+            Time time = lastOnlineTime(user.getLastOnlineInfo());
+            lastOnlineInfo = lastOnlineStatus(time);
         }
-        Drawable background = ContextCompat.getDrawable(holder.itemView.getContext(),bgResid);
+
+        Drawable background = ContextCompat.getDrawable(holder.itemView.getContext(), bgResid);
         holder.onlineStatus.setBackground(background);
+        holder.textViewLastOnlineInfo.setText(lastOnlineInfo);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (onUserClickListener !=null) {
+                if (onUserClickListener != null) {
                     onUserClickListener.onUserClick(user);
                 }
             }
@@ -62,12 +72,14 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     static class UserViewHolder extends RecyclerView.ViewHolder {
         private TextView textViewUserInfo;
         private View onlineStatus;
+        private TextView textViewLastOnlineInfo;
 
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewUserInfo = itemView.findViewById(R.id.textViewUserInfo);
             onlineStatus = itemView.findViewById(R.id.onlineStatus);
+            textViewLastOnlineInfo = itemView.findViewById(R.id.textViewLastOnlineInfo);
         }
     }
 
@@ -79,4 +91,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     public void setOnUserClickListener(OnUserClickListener onUserClickListener) {
         this.onUserClickListener = onUserClickListener;
     }
+
+
 }

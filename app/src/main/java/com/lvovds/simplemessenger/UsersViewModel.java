@@ -1,5 +1,7 @@
 package com.lvovds.simplemessenger;
 
+import static com.lvovds.simplemessenger.Time.currentDate;
+
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -18,8 +20,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class UsersViewModel extends ViewModel {
     private FirebaseAuth mAuth;
@@ -76,6 +83,10 @@ public class UsersViewModel extends ViewModel {
             return;
         }
         usersReference.child(firebaseUser.getUid()).child("online").setValue(isOnline);
+        if (!isOnline) {
+            String lastOnlineInfo = currentDate();
+            usersReference.child(firebaseUser.getUid()).child("lastOnlineInfo").setValue(lastOnlineInfo);
+        }
     }
 
     public void setUserTokenId() {

@@ -1,8 +1,12 @@
 package com.lvovds.simplemessenger;
 
+import static com.lvovds.simplemessenger.Time.currentDate;
+
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -17,9 +21,20 @@ import com.google.firebase.database.ValueEventListener;
 import com.lvovds.simplemessenger.notification.MessageSend;
 import com.lvovds.simplemessenger.notification.Notification;
 
-import java.io.Closeable;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -33,11 +48,11 @@ public class ChatViewModel extends ViewModel {
     private MutableLiveData<List<Message>> messages = new MutableLiveData<>();
     private MutableLiveData<User> otherUser = new MutableLiveData<>();
     private MutableLiveData<Boolean> messageSent = new MutableLiveData<>();
+    private MutableLiveData<Boolean> messageDelete = new MutableLiveData<>();
     private MutableLiveData<String> error = new MutableLiveData<>();
-    private User user;
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference referenceUsers = firebaseDatabase.getReference("Users");
+    private DatabaseReference usersReference = firebaseDatabase.getReference("Users");
     private DatabaseReference referenceMessages = firebaseDatabase.getReference("Messages");
 
 
@@ -50,12 +65,12 @@ public class ChatViewModel extends ViewModel {
     public ChatViewModel(String currentUserId, String otherUserId) {
         this.currentUserId = currentUserId;
         this.otherUserId = otherUserId;
-        referenceUsers.child(otherUserId).addValueEventListener(new ValueEventListener() {
+        usersReference.child(otherUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 otherUser.setValue(user);
-                otherUserInfo=user;
+                otherUserInfo = user;
             }
 
             @Override
@@ -63,11 +78,11 @@ public class ChatViewModel extends ViewModel {
 
             }
         });
-        referenceUsers.child(currentUserId).addValueEventListener(new ValueEventListener() {
+        usersReference.child(currentUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                userInfo=user;
+                userInfo = user;
             }
 
             @Override
@@ -79,8 +94,7 @@ public class ChatViewModel extends ViewModel {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Message> messageList = new ArrayList<>();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Message message = dataSnapshot.getValue(Message.class);
                     messageList.add(message);
                 }
@@ -95,7 +109,15 @@ public class ChatViewModel extends ViewModel {
     }
 
     public void setUserOnline(boolean isOnline) {
-        referenceUsers.child(currentUserId).child("online").setValue(isOnline);
+        usersReference.child(currentUserId).child("online").setValue(isOnline);
+        if (!isOnline) {
+            String lastOnlineInfo = currentDate();
+            usersReference.child(currentUserId).child("lastOnlineInfo").setValue(lastOnlineInfo);
+        }
+    }
+
+    public void setUserTyping(boolean isTyping) {
+        usersReference.child(currentUserId).child("typing").setValue(isTyping);
     }
 
     public LiveData<List<Message>> getMessages() {
@@ -114,11 +136,34 @@ public class ChatViewModel extends ViewModel {
         return error;
     }
 
+    public LiveData<Boolean> getMessageDelete() {
+        return messageDelete;
+    }
+
     public void sendMessage(Message message) {
+//        String aesText = "";
+//        try {
+//            aesText = Aes256Class.encrypt(message.getText(),Aes256Class.getKeyFromPassword(currentUserId));
+//        } catch (NoSuchPaddingException e) {
+//            e.printStackTrace();
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        } catch (InvalidAlgorithmParameterException e) {
+//            e.printStackTrace();
+//        } catch (InvalidKeyException e) {
+//            e.printStackTrace();
+//        } catch (BadPaddingException e) {
+//            e.printStackTrace();
+//        } catch (IllegalBlockSizeException e) {
+//            e.printStackTrace();
+//        } catch (InvalidKeySpecException e) {
+//            e.printStackTrace();
+//        }
+//        message.setText(aesText);
         referenceMessages
                 .child(message.getSendId())
                 .child(message.getReceiverId())
-                .push()
+                .child(message.getMessageId())
                 .setValue(message)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -126,7 +171,7 @@ public class ChatViewModel extends ViewModel {
                         referenceMessages
                                 .child(message.getReceiverId())
                                 .child(message.getSendId())
-                                .push()
+                                .child(message.getMessageId())
                                 .setValue(message)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
@@ -134,7 +179,7 @@ public class ChatViewModel extends ViewModel {
                                         messageSent.setValue(true);
                                         Disposable disposable = ApiFactory.apiService
                                                 .messageResponse(new MessageSend(otherUserInfo.getToken()
-                                                        ,new Notification(message.getText(),userInfo.getName()+" "+userInfo.getLastName())))
+                                                        , new Notification(message.getText(), userInfo.getName() + " " + userInfo.getLastName())))
                                                 .subscribeOn(Schedulers.io())
                                                 .subscribe(new Consumer<String>() {
                                                     @Override
@@ -144,7 +189,7 @@ public class ChatViewModel extends ViewModel {
                                                 }, new Consumer<Throwable>() {
                                                     @Override
                                                     public void accept(Throwable throwable) throws Throwable {
-                                                        Log.d("MainActivity",throwable.getMessage());
+                                                        Log.d("MainActivity", throwable.getMessage());
                                                     }
                                                 });
                                         compositeDisposable.add(disposable);
@@ -165,6 +210,58 @@ public class ChatViewModel extends ViewModel {
 
     }
 
+    public void removeMessageForAllUsers(Message message) {
+
+        referenceMessages.child(message.getSendId())
+                .child(message.getReceiverId())
+                .child(message.getMessageId())
+                .removeValue()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        referenceMessages
+                                .child(message.getReceiverId())
+                                .child(message.getSendId())
+                                .child(message.getMessageId())
+                                .removeValue()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        messageDelete.setValue(true);
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        error.setValue(e.getMessage());
+                                    }
+                                });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        error.setValue(e.getMessage());
+                    }
+                });
+    }
+
+    public void removeMessageForMe(Message message) {
+        referenceMessages
+                .child(currentUserId)
+                .child(otherUserId)
+                .child(message.getMessageId())
+                .removeValue()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        messageDelete.setValue(true);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        error.setValue(e.getMessage());
+                    }
+                });
+    }
 
 
     @Override

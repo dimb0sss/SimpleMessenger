@@ -20,6 +20,23 @@
         android:padding="16dp"
         />
 
+    <TextView
+        android:id="@+id/textViewLastOnlineInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.6"
+        android:gravity="right"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:paddingEnd="40dp"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewTitle"
+        app:layout_constraintEnd_toEndOf="@+id/textViewTitle"
+        app:layout_constraintStart_toStartOf="@+id/textViewTitle"
+        app:layout_constraintTop_toTopOf="@+id/textViewTitle"
+        tools:text="Online" />
+
     <View
         android:id="@+id/onlineStatus"
         android:layout_width="12dp"
@@ -49,6 +66,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:inputType="textMultiLine"
         android:background="@color/white"
+        android:paddingEnd="48dp"
         android:padding="12dp"
         android:textSize="16dp"
         android:hint="Type your message:"/>

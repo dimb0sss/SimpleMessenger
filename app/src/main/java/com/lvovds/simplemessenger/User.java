@@ -6,15 +6,19 @@ public class User {
     private String lastName;
     private  int age;
     private boolean online;
+    private boolean typing;
     private String token;
+    private String lastOnlineInfo;
 
-    public User(String id, String name, String lastName, int age, boolean online, String token) {
+    public User(String id, String name, String lastName, int age, boolean online, boolean typing, String token, String lastOnlineInfo) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.age = age;
         this.online = online;
+        this.typing = typing;
         this.token = token;
+        this.lastOnlineInfo = lastOnlineInfo;
     }
 
     public User() {
@@ -42,5 +46,13 @@ public class User {
 
     public String getToken() {
         return token;
+    }
+
+    public String getLastOnlineInfo() {
+        return lastOnlineInfo;
+    }
+
+    public boolean isTyping() {
+        return typing;
     }
 }

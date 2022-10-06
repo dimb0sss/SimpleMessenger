@@ -71,7 +71,7 @@ public class RegisterViewModel extends ViewModel {
                                     }
                                 });
 
-                        User user = new User(firebaseUser.getUid(),name,lastName,age,false,tokenId);
+                        User user = new User(firebaseUser.getUid(),name,lastName,age,false,false,tokenId,"");
                         usersReference.child(firebaseUser.getUid()).setValue(user);
                     }
                 }).addOnFailureListener(new OnFailureListener() {

@@ -88,6 +88,12 @@ public class UsersActivity extends AppCompatActivity {
         if (item.getItemId()==R.id.itemLoginOut) {
             usersViewModel.logOut();
         }
+        if (item.getItemId()==R.id.itemSetting) {
+            Intent intent = new Intent(UsersActivity.this,SettingsActivity.class);
+            startActivity(intent);
+
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

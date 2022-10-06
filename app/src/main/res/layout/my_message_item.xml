@@ -7,13 +7,45 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
+        android:id="@+id/textViewHeaderDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/my_message_background_with_header"
+        android:gravity="center"
+        android:maxWidth="150dp"
+        android:minWidth="150dp"
+        android:minHeight="15dp"
+        android:padding="4dp"
+        android:paddingBottom="16dp"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="04-10" />
+
+    <TextView
         android:id="@+id/textViewMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:maxWidth="250dp"
         android:background="@drawable/my_message_background"
-        tools:text="Long Long Long Long Long Long Long Long Long Long Long Long Long Long Long Long"/>
+        android:maxWidth="250dp"
+        android:minWidth="100dp"
+        android:minHeight="55dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewHeaderDate"
+        tools:text="Long" />
+
+    <TextView
+        android:id="@+id/textViewTimeSending"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/my_message_background"
+        android:padding="4dp"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="12:00" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
